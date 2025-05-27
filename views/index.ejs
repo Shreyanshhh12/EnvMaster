@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EnvMaster - Multi Project .env Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-8">
+  <div class="max-w-4xl mx-auto bg-white rounded shadow p-6">
+    <h1 class="text-2xl font-bold mb-6">EnvMaster - Multi Project .env Manager</h1>
+
+    <form action="/save" method="POST" class="space-y-4">
+
+      <div>
+        <label for="project" class="block font-semibold mb-1">Select Project:</label>
+        <select
+          name="project"
+          id="project"
+          onchange="location = '?project=' + encodeURIComponent(this.value)"
+          class="border rounded px-3 py-1 w-full max-w-xs"
+        >
+          <% projects.forEach(proj => { %>
+            <option value="<%= proj %>" <%= proj === selectedProject ? 'selected' : '' %>>
+              <%= proj %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <input type="hidden" name="project" value="<%= selectedProject %>" />
+
+      <table class="w-full border-collapse border border-gray-300">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-3 py-1 text-left">Key</th>
+            <th class="border border-gray-300 px-3 py-1 text-left">Value</th>
+            <th class="border border-gray-300 px-3 py-1">Delete</th>
+          </tr>
+        </thead>
+        <tbody id="env-table-body">
+          <% envVars.forEach(({ key, value }) => { %>
+            <tr>
+              <td class="border border-gray-300 px-3 py-1">
+                <input type="text" name="keys" value="<%= key %>" class="w-full border rounded px-2 py-1" />
+              </td>
+              <td class="border border-gray-300 px-3 py-1">
+                <input type="text" name="values" value="<%= value %>" class="w-full border rounded px-2 py-1" />
+              </td>
+              <td class="border border-gray-300 px-3 py-1 text-center">
+                <button type="button" class="delete-row text-red-600 font-bold">X</button>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+
+      <button
+        type="button"
+        id="add-row"
+        class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        + Add Row
+      </button>
+
+      <div>
+        <button
+          type="submit"
+          class="mt-4 bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+        >
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Add Row functionality
+    document.getElementById('add-row').addEventListener('click', () => {
+      const tbody = document.getElementById('env-table-body');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="border border-gray-300 px-3 py-1">
+          <input type="text" name="keys" class="w-full border rounded px-2 py-1" />
+        </td>
+        <td class="border border-gray-300 px-3 py-1">
+          <input type="text" name="values" class="w-full border rounded px-2 py-1" />
+        </td>
+        <td class="border border-gray-300 px-3 py-1 text-center">
+          <button type="button" class="delete-row text-red-600 font-bold">X</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Delete Row functionality
+    document.getElementById('env-table-body').addEventListener('click', (e) => {
+      if (e.target.classList.contains('delete-row')) {
+        e.target.closest('tr').remove();
+      }
+    });
+  </script>
+</body>
+</html>
